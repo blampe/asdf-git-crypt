@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+list_all_versions() {
+  git ls-remote --tags --refs https://github.com/AGWA/git-crypt.git |
+    grep -o 'refs/tags/[0-9\.]*' |
+    cut -d/ -f3- |
+    sed 's/^v//'
+}
+
+list_all_versions | sort | xargs echo

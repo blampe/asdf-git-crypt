@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+trap cleanup SIGINT SIGTERM ERR
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR
+  rm -rf "$ASDF_INSTALL_PATH"
+  echo
+  echo -e "\e[33mCleanup:\e[m Something went wrong!"
+  echo
+  echo "$(caller): ${BASH_COMMAND}"
+}
+
+download_git_crypt() {
+  local install_type=$1
+  local version=$2
+  local download_path=$3
+
+  if [ "$install_type" != "version" ]; then
+    fail "asdf-git-crypt supports release installs only"
+  fi
+
+  local platform
+
+  case "$OSTYPE" in
+    darwin*) platform="linux" ;;
+    FreeBSD*) platform="linux" ;;
+    linux*) platform="linux" ;;
+    netbsd*) platform="linux" ;;
+    openbsd*) platform="linux" ;;
+    *) fail "Unsupported platform" ;;
+  esac
+
+  local architecture
+
+  case "$(uname -m)" in
+    i686*) architecture="x86_64" ;;
+    x86_64*) architecture="x86_64" ;;
+    *) fail "Unsupported architecture" ;;
+  esac
+
+  local download_url="https://github.com/AGWA/git-crypt/releases/download/${version}/git-crypt-${version}-${platform}-${architecture}"
+  local source_path="$(mkdir -v -p ${download_path}/bin)/git-crypt"
+
+  echo "Downloading git-crypt..."
+  curl --fail --silent --location --create-dirs --output "$source_path" "$download_url"
+  chmod +x "$source_path"
+}
+
+download_git_crypt "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_DOWNLOAD_PATH"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+install_git_crypt() {
+  local install_type=$1
+  local version=$2
+  local install_path=$3
+
+  # We only handle releases for now, so nothing to do.
+
+  echo "The installation was successful!"
+}
+
+install_git_crypt "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
